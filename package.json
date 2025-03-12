@@ -6,8 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "keywords": [
+    "MVC",
+    "Pug",
+    "Tailwindcc",
+    "MySQL",
+    "Squelize"
+  ],
+  "author": "Susana Calzadilla",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
