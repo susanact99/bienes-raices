@@ -1,9 +1,22 @@
-head
-  link(rel="stylesheet", href="../../css/output.css")
+extends ../layout/index.pug
 
+block content
 
-div
+  div.py-10
+    h1.text-4xl.my-10.font-extrabold.text-center Real
+      span.font-normal state 
+    h2.text-center.text-2xl.font-extrabold= page
 
-  h2.text-center.text-6xl Login 
-
-  p Inicia sesión
+    .mt-8.mx-auto.max-w-md 
+      .bg-white.py-8.px-4.shadow 
+        form.space-y-2
+          div 
+            label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="email") EMAIL
+            input#email.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400.mb-2(placeholder="Your email..." type="email" name="email")
+          div 
+            label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="password") PASSWORD
+            input#password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400.mb-2(placeholder="Your password..." type="password" name="password")
+          div.flex.items-center.justify-between.p-2 
+            a.text-gray-500.text-s(href="/auth/register") Sig in 
+            a.text-gray-500.text-s(href="/auth/forgot-password") Forgot my password 
+          input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Login")
