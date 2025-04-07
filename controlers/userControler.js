@@ -1,7 +1,9 @@
 import { check, validationResult } from 'express-validator'
+import bcrypt from 'bcrypt'
 import User from "../models/User.js"
 import { generateId } from '../helpers/token.js'
-import { emailRegister } from '../helpers/email.js'
+import { emailRegister, emailForgotPassword } from '../helpers/email.js'
+
 
 const formLogin = (req, res) => {
     res.render('auth/login', {
@@ -32,7 +34,7 @@ const userRegister = async (req, res) => {
         return res.render('auth/register', {
             page: "Create acount",
             csrfToken: req.csrfToken(),
-            errors: resultado.array(),
+            errors: result.array(),
             user: {
                 name: req.body.name,
                 email: req.body.email
@@ -133,13 +135,89 @@ const resetPassword = async (req, res) => {
 
     const user = await User.findOne({ where: { email } })
 
-    if(!user){
+    if (!user) {
         return res.render('auth/forgot-password', {
-            page: "Recover you access to Real State",
+            page: "Recover your access to Real State",
             csrfToken: req.csrfToken(),
-            errors: [{msg: "The email does not belong to any user"}]
+            errors: [{ msg: "The email does not belong to any user" }]
         })
     }
+
+    //Generar un token y enviar un email 
+    user.token = generateId()
+    await user.save()
+
+    //Enviar un email
+    emailForgotPassword({
+        email: user.email,
+        name: user.name,
+        token: user.token
+    })
+
+    //Renderizar mensaje
+    res.render('templates/message', {
+        page: 'Reset your password',
+        message: 'We sent an email with the instructions',
+        error: false
+    })
+}
+
+const verifyToken = async (req, res) => {
+    const {token} = req.params
+    const user = await User.findOne({where: {token}})
+
+    if (!user) {
+        return res.render('auth/confirm-account', {
+            page: 'Reset your password',
+            message: 'There was an error validating the information, please try again',
+            error: true
+        })
+    }
+
+    //Mostrar formulario para validar el password
+
+    res.render('auth/reset-password',{
+        page: 'Restablece tu password',
+        csrfToken: req.csrfToken()
+    })
+}
+
+const newPassword = async(req, res) => {
+
+    //Validar el password
+    await check('password').isLength({ min: 6 }).withMessage('The password must be longer than 6 characters').run(req)
+    let result = validationResult(req)
+
+
+    //Verificar que el resultado entre vacio
+    if (!result.isEmpty()) {
+        //Errores
+        return res.render('auth/reset-password', {
+            page: "Reset your password",
+            csrfToken: req.csrfToken(),
+            errors: result.array(),
+            
+        })
+    }
+
+    const {token} = req.params
+    const {password} = req.body
+
+    //Identificar quien hace el cambio
+
+    const user = await User.findOne({where: {token}})
+
+    //Hashear el nuevo password
+
+    const salt = await bcrypt.genSalt(10)
+    user.password = await bcrypt.hash(password, salt)
+    user.token = null;
+    await user.save()
+
+    res.render('auth/confirm-account', {
+        page: 'New password saved',
+        message: 'The password was saved succesfully'
+    })
 }
 
 export {
@@ -148,5 +226,7 @@ export {
     formForgotPassword,
     userRegister,
     confirmAccount,
-    resetPassword
+    resetPassword,
+    verifyToken,
+    newPassword
 }
