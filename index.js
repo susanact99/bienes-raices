@@ -27,12 +27,12 @@ try{
     console.error(error)
 }
 
-//routing
-app.use('/auth', userRoutes)
-
 //habilitar pug
 app.set('view engine','pug')
 app.set('views','./views')
+
+//routing
+app.use('/auth', userRoutes)
 
 //carpeta publica
 app.use(express.static('public'))

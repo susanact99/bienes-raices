@@ -7,9 +7,15 @@ block content
       span.font-normal state 
     h2.text-center.text-2xl.font-extrabold= page
 
+    if errors 
+      div(class="max-w-md mx-auto my-10")
+        each error in errors
+          p.bg-red-600.text-white.uppercase.text-xs.text-center.p-2.mb-1.font-bold= error.msg
+
     .mt-8.mx-auto.max-w-md 
       .bg-white.py-8.px-4.shadow 
-        form.space-y-2
+        form.space-y-2(method="POST", action="/auth/login")
+          input(type="hidden", name="_csrf", value=csrfToken)
           div 
             label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="email") EMAIL
             input#email.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400.mb-2(placeholder="Your email..." type="email" name="email")
@@ -17,6 +23,6 @@ block content
             label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="password") PASSWORD
             input#password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400.mb-2(placeholder="Your password..." type="password" name="password")
           div.flex.items-center.justify-between.p-2 
-            a.text-gray-500.text-s(href="/auth/register") Sig in 
+            a.text-gray-500.text-s(href="/auth/register") Sign in 
             a.text-gray-500.text-s(href="/auth/forgot-password") Forgot my password 
           input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Login")

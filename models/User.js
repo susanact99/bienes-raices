@@ -16,7 +16,10 @@ const User = db.define('user', {
         allowNull: false
     },
     token: DataTypes.STRING,
-    confirm: DataTypes.BOOLEAN
+    confirm: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 },{
     hooks: {
         beforeCreate: async function(user){
@@ -25,5 +28,12 @@ const User = db.define('user', {
         }
     }
 })
+
+//Metodos personalizados
+
+User.prototype.checkPassword =async function (password){
+    if (!password || !this.password) return false;
+    return await bcrypt.compareSync(password, this.password);
+}
 
 export default User;

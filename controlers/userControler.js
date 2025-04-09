@@ -1,21 +1,83 @@
 import { check, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
 import User from "../models/User.js"
-import { generateId } from '../helpers/token.js'
+import { generateId, generateJWT } from '../helpers/token.js'
 import { emailRegister, emailForgotPassword } from '../helpers/email.js'
 
 
 const formLogin = (req, res) => {
     res.render('auth/login', {
-        page: "Login"
+        page: "Login",
+        csrfToken: req.csrfToken()
     })
 }
 
 const formRegister = (req, res) => {
     res.render('auth/register', {
-        page: "Create acount",
+        page: "Create account",
         csrfToken: req.csrfToken()
     })
+}
+
+const authenticate = async (req, res) => {
+    console.log('--------------------authenticating...')
+    //Validacion
+    await check('email').isEmail().withMessage('The email is required').run(req)
+    await check('password').notEmpty().withMessage('The password is required').run(req)
+
+    let result = validationResult(req)
+
+
+    //Verificar que el resultado entre vacio
+    if (!result.isEmpty()) {
+        //Errores
+        return res.render('auth/login', {
+            page: "Login",
+            csrfToken: req.csrfToken(),
+            errors: result.array(),
+
+        })
+    }
+
+    //Comprobar si el usuario existe
+    const { email, password } = req.body
+    const user = await User.findOne({ where: { email } })
+    if (!user) {
+        return res.render('auth/login', {
+            page: "Login",
+            csrfToken: req.csrfToken(),
+            errors: [{ msg: 'User does not exist' }],
+        })
+    }
+
+    //Comprobar si el usuario est aconfirmado
+    if (!user.confirm) {
+        return res.render('auth/login', {
+            page: 'Login',
+            csrfToken: req.csrfToken(),
+            errors: [{ msg: 'The user is not confirmed' }]
+        })
+    }
+
+    //Revisar el password
+    if (!(await user.checkPassword(password))) {
+        return res.render('auth/login', {
+            page: 'Login',
+            csrfToken: req.csrfToken(),
+            errors: [{ msg: 'The password is incorrect' }]
+        })
+    }
+
+    //Autenticar al usuario
+    const token = generateJWT({id: user.id, name: user.name})
+
+    console.log(token)
+
+    //Almacenar la cookie
+    return res.cookie('_token', token, {
+        httpOnly: true,
+        //secure: true
+    }).redirect('/my-realstate')
 }
 
 const userRegister = async (req, res) => {
@@ -97,7 +159,7 @@ const confirmAccount = async (req, res) => {
 
     //Confirmar la cuenta
     user.token = null;
-    user.confirmed = true;
+    user.confirm = true;
     await user.save();
 
     res.render('auth/confirm-account', {
@@ -163,8 +225,8 @@ const resetPassword = async (req, res) => {
 }
 
 const verifyToken = async (req, res) => {
-    const {token} = req.params
-    const user = await User.findOne({where: {token}})
+    const { token } = req.params
+    const user = await User.findOne({ where: { token } })
 
     if (!user) {
         return res.render('auth/confirm-account', {
@@ -176,13 +238,13 @@ const verifyToken = async (req, res) => {
 
     //Mostrar formulario para validar el password
 
-    res.render('auth/reset-password',{
+    res.render('auth/reset-password', {
         page: 'Restablece tu password',
         csrfToken: req.csrfToken()
     })
 }
 
-const newPassword = async(req, res) => {
+const newPassword = async (req, res) => {
 
     //Validar el password
     await check('password').isLength({ min: 6 }).withMessage('The password must be longer than 6 characters').run(req)
@@ -196,16 +258,16 @@ const newPassword = async(req, res) => {
             page: "Reset your password",
             csrfToken: req.csrfToken(),
             errors: result.array(),
-            
+
         })
     }
 
-    const {token} = req.params
-    const {password} = req.body
+    const { token } = req.params
+    const { password } = req.body
 
     //Identificar quien hace el cambio
 
-    const user = await User.findOne({where: {token}})
+    const user = await User.findOne({ where: { token } })
 
     //Hashear el nuevo password
 
@@ -223,6 +285,7 @@ const newPassword = async(req, res) => {
 export {
     formLogin,
     formRegister,
+    authenticate,
     formForgotPassword,
     userRegister,
     confirmAccount,
