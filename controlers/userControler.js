@@ -20,7 +20,6 @@ const formRegister = (req, res) => {
 }
 
 const authenticate = async (req, res) => {
-    console.log('--------------------authenticating...')
     //Validacion
     await check('email').isEmail().withMessage('The email is required').run(req)
     await check('password').notEmpty().withMessage('The password is required').run(req)

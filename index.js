@@ -2,6 +2,8 @@ import express from 'express'
 import csrf from 'csurf'
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/userRoutes.js'
+import propertyRoutes from './routes/propertyRoutes.js'
+
 import db from './config/db.js'
 
 const app = express()
@@ -31,11 +33,13 @@ try{
 app.set('view engine','pug')
 app.set('views','./views')
 
-//routing
-app.use('/auth', userRoutes)
-
 //carpeta publica
 app.use(express.static('public'))
+
+//routing
+app.use('/auth', userRoutes)
+app.use('/', propertyRoutes)
+
 
 
 //definir puerto y arrancar el proyecto
