@@ -7,7 +7,12 @@
     "start": "node index.js",
     "server": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "css": "tailwindcss -i ./public/css/tailwindcss.css -o ./public/css/output.css --watch"
+    "css": "tailwindcss -i ./public/css/tailwindcss.css -o ./public/css/output.css --watch",
+    "js": "webpack --watch",
+    "dev": "concurrently \"npm run css\" \"npm run js\" ",
+    "db:import": "node ./seed/seeder.js -i",
+    "db:delete": "node ./seed/seeder.js -e"
+
   },
   "keywords": [
     "MVC",
@@ -35,6 +40,9 @@
     "tailwindcss": "^4.0.14"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.9",
+    "webpack": "^5.99.5",
+    "webpack-cli": "^6.0.1"
   }
 }
