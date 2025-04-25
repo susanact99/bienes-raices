@@ -3,13 +3,13 @@ import Price from './Price.js'
 import Category from './Category.js'
 import User from './User.js'
 
-//Price.hasOne(Property)
-Property.belongsTo(Price, {foreignKey: 'priceId'})
-Property.belongsTo(Category, {foreignKey: 'categoryId'})
-Property.belongsTo(User, {foreignKey: 'userId'})
+
+Property.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
+Property.belongsTo(Price, { foreignKey: 'priceId', onDelete: 'CASCADE' });
+Property.belongsTo(Category, { foreignKey: 'categoryId', onDelete: 'CASCADE' });
 
 
-
+ 
 export{
     Property,
     Price,

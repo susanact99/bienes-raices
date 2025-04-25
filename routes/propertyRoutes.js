@@ -1,12 +1,14 @@
 import express from 'express'
 import{body} from 'express-validator'
-import {admin, create, save} from '../controlers/propertyController.js'
+import {admin, create, save, addImage, saveImage} from '../controlers/propertyController.js'
+import protectRoute from '../middleware/protectRoutes.js'
+import upload from '../middleware/uploadImage.js'
 
 const router = express.Router()
 
-router.get('/my-realstate', admin)
-router.get('/properties/create', create)
-router.post('/properties/create',
+router.get('/my-realstate',protectRoute, admin)
+router.get('/properties/create',protectRoute, create)
+router.post('/properties/create',protectRoute, 
     body('title').notEmpty().withMessage('The title of the post is required'),
     body('description')
         .notEmpty().withMessage('The title of the post is required')
@@ -20,6 +22,13 @@ router.post('/properties/create',
 
     save)
 
+
+router.get('/properties/add-image/:id', protectRoute, addImage)
+router.post('/properties/add-image/:id', 
+    protectRoute, 
+    upload.single('image'),
+    saveImage
+)
 
 
 

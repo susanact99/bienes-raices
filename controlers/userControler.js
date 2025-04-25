@@ -75,6 +75,7 @@ const authenticate = async (req, res) => {
     //Almacenar la cookie
     return res.cookie('_token', token, {
         httpOnly: true,
+       // expires: 9000
         //secure: true
     }).redirect('/my-realstate')
 }

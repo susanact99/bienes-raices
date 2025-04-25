@@ -1,8 +1,9 @@
 import {exit} from 'node:process'
 import categories from './categories.js'
 import prices from './prices.js'
+import users from './users.js'
 import db from '../config/db.js'
-import {Category,Price} from '../models/index.js'
+import {Category,Price, User, Property} from '../models/index.js'
 
 const importData = async() =>{
     try {
@@ -10,13 +11,15 @@ const importData = async() =>{
         await db.authenticate()
 
         //Generar columnas
-        await db.sync()
+        await db.sync({ force: true });
+
 
         //Insertar datos
         //Si no depende uno de otro se usa Promise.all en vez de un doble await
         await Promise.all([
             Category.bulkCreate(categories),
-            Price.bulkCreate(prices)
+            Price.bulkCreate(prices),
+            User.bulkCreate(users)
         ])
 
         console.log('Datos importados correctamente')
@@ -27,22 +30,25 @@ const importData = async() =>{
     }
 }
 
-const deleteData = async () =>{
+const deleteData = async () => {
     try {
-        await Promise.all([
-            Category.destroy({where:{}, truncate: true}),
-            Price.destroy({where:{}, truncate: { cascade: true }})
-        ])
+        // Primero elimina los registros de la tabla que tiene las claves foráneas
+        await Property.destroy({ where: {}, force: true });
 
-        //Otra forma de hacerlo
-        //await db.sync({force.: true})
-        console.log('Data deleted succesfully')
-        exit()
+        // Luego elimina el resto
+        await Promise.all([
+            Category.destroy({ where: {}, force: true }),
+            Price.destroy({ where: {}, force: true }),
+            User.destroy({ where: {}, force: true })
+        ]);
+
+        console.log('Data deleted successfully');
+        exit(0);
     } catch (error) {
-        console.log(error)
-        exit(1)
+        console.log(error);
+        exit(1);
     }
-}
+};
 
 
 if(process.argv[2] ==="-e"){
