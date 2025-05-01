@@ -267,6 +267,29 @@ const deleteProperty = async(req, res) => {
      res.redirect('my-realstate')
 }
 
+//Mostrar propiedad
+const showProperty = async(req,res)=>{
+    const {id} = req.params
+
+    //Comprobar que la propiedad existe
+    const property = await Property.findByPk(id, {
+        include: [
+            {model: Price, as: 'price'},
+            {model: Category, as: 'category'}
+        ]
+    })
+
+    if(!property){
+        return res.redirect('/404')
+    }
+
+
+    res.render('properties/show',{
+        property,
+        page: property.title
+    })
+}
+
 export {
     admin,
     create,
@@ -275,5 +298,6 @@ export {
     saveImage,
     edit,
     saveChanges,
-    deleteProperty
+    deleteProperty,
+    showProperty
 }
