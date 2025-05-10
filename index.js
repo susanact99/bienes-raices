@@ -3,6 +3,10 @@ import csrf from 'csurf'
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/userRoutes.js'
 import propertyRoutes from './routes/propertyRoutes.js'
+import appRoutes from './routes/appRoutes.js'
+import apiRoutes from './routes/apiRoutes.js'
+
+
 
 import db from './config/db.js'
 
@@ -37,8 +41,11 @@ app.set('views','./views')
 app.use(express.static('public'))
 
 //routing
+app.use('/', appRoutes)
 app.use('/auth', userRoutes)
 app.use('/', propertyRoutes)
+app.use('/api', apiRoutes)
+
 
 
 

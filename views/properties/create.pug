@@ -42,7 +42,7 @@ block content
                     div(class="md:w-1/2") 
                         label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="price") Price
                         select#price.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400.mb-2(name="price")
-                            option(value="" ) - Select -
+                            option(value="") - Select -
                             each price in prices 
                                 option(value=price.id selected=data.price ? data.price == price.id ? true : false : false)=price.name
                 

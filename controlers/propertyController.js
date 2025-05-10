@@ -1,26 +1,57 @@
-import {unlink } from 'node:fs/promises'
+import { unlink } from 'node:fs/promises'
 import { validationResult } from "express-validator"
 import { Price, Category, Property } from '../models/index.js'
 
 const admin = async (req, res) => {
 
-    const { id } = req.user
+    //Leer QueryString
+    const { page: currentPage } = req.query
 
-    const properties = await Property.findAll({
-        where: {
-            userId: id
-        },
-        include: [
-            { model: Category, as: 'category' },
-            { model: Price, as: 'price' },
-        ]
-    })
+    const expresion = /^[1-9]$/
 
-    res.render('properties/admin', {
-        page: 'My real state',
-        csrfToken: req.csrfToken(),
-        properties
-    })
+    if (!expresion.test(currentPage)) {
+        return res.redirect('/my-realstate?page=1')
+    }
+
+    try {
+        const { id } = req.user
+
+        //Limites y offset
+        const limit = 5
+        const offset = ((currentPage * limit) - limit)
+
+        const [properties, total] = await Promise.all([
+             Property.findAll({
+                limit,
+                offset,
+                where: {
+                    userId: id
+                },
+                include: [
+                    { model: Category, as: 'category' },
+                    { model: Price, as: 'price' },
+                ]
+            }), 
+            Property.count({
+                where: {
+                    userId: id
+                }
+            })
+        ])
+
+        res.render('properties/admin', {
+            page: 'My real state',
+            csrfToken: req.csrfToken(),
+            properties,
+            pages: Math.ceil(total / limit),
+            currentPage: Number(currentPage),
+            total,
+            offset,
+            limit
+        })
+    } catch (error) {
+        console.log(error)
+    }
 }
 //Formulario para crear una nueva propiedad
 const create = async (req, res) => {
@@ -62,7 +93,8 @@ const save = async (req, res) => {
 
     //Generar registro
 
-    const { title, description, rooms, parking, bathrooms, street, lat, lng, price: priceId, category: categoryId } = req.body
+    const { title, description, rooms, parking, bathrooms, street, lat, lng, price, category } = req.body;
+
 
     const { id: userId } = req.user
 
@@ -76,12 +108,16 @@ const save = async (req, res) => {
             street,
             lat,
             lng,
-            priceId,
+            priceId: price,
+            categoryId: category,
             userId,
             image: ''
-        })
+        });
+
 
         const { id } = savedProperty
+        console.log('Body:', req.body)
+
 
         res.redirect(`/properties/add-image/${id}`)
     } catch (error) {
@@ -160,7 +196,7 @@ const edit = async (req, res) => {
     }
 
     //Revisar que quien visita la URL es quien creó la propiedad
-    if(property.userId.toString() !== req.user.id.toString()){
+    if (property.userId.toString() !== req.user.id.toString()) {
         return res.redirect('/my-realstate')
     }
 
@@ -201,90 +237,93 @@ const saveChanges = async (req, res) => {
 
     const { id } = req.params
 
-     //Validar que la propiedad exista
-     
-     const property = await Property.findByPk(id)
- 
-     if (!property) {
-         return res.redirect('/my-realstate')
-     }
- 
-     //Revisar que quien visita la URL es quien creó la propiedad
-     if(property.userId.toString() !== req.user.id.toString()){
-         return res.redirect('/my-realstate')
-     }
+    //Validar que la propiedad exista
+
+    const property = await Property.findByPk(id)
+
+    if (!property) {
+        return res.redirect('/my-realstate')
+    }
+
+    //Revisar que quien visita la URL es quien creó la propiedad
+    if (property.userId.toString() !== req.user.id.toString()) {
+        return res.redirect('/my-realstate')
+    }
 
 
-     //Reescribir los valores de la propiedad
-     try {
-        
+    //Reescribir los valores de la propiedad
+    try {
+
         const { title, description, rooms, parking, bathrooms, street, lat, lng, price: priceId, category: categoryId } = req.body
 
         property.set({
-            title, 
-            description, 
-            rooms, 
-            parking, 
-            bathrooms, 
-            street, 
-            lat, 
-            lng, 
-            priceId, 
-            categoryId 
+            title,
+            description,
+            rooms,
+            parking,
+            bathrooms,
+            street,
+            lat,
+            lng,
+            priceId,
+            categoryId
         })
 
         await property.save()
 
         res.redirect('/my-realstate')
 
-     } catch (error) {
+    } catch (error) {
         console.log(error)
-     }
+    }
 }
 
-const deleteProperty = async(req, res) => {
+const deleteProperty = async (req, res) => {
 
     const { id } = req.params
 
-     //Validar que la propiedad exista
-     
-     const property = await Property.findByPk(id)
- 
-     if (!property) {
-         return res.redirect('/my-realstate')
-     }
- 
-     //Revisar que quien visita la URL es quien creó la propiedad
-     if(property.userId.toString() !== req.user.id.toString()){
-         return res.redirect('/my-realstate')
-     }
+    //Validar que la propiedad exista
 
-     //Eliminar la imagen asociada
-     await unlink(`public/uploads/${property.image}`)
+    const property = await Property.findByPk(id)
 
-     //Eliminar la propiedad
-     property.destroy()
-     res.redirect('my-realstate')
+    if (!property) {
+        return res.redirect('/my-realstate')
+    }
+
+    //Revisar que quien visita la URL es quien creó la propiedad
+    if (property.userId.toString() !== req.user.id.toString()) {
+        return res.redirect('/my-realstate')
+    }
+
+    //Eliminar la imagen asociada
+    if (property.image) {
+        await unlink(`public/uploads/${property.image}`);
+    }
+
+
+    //Eliminar la propiedad
+    property.destroy()
+    res.redirect('/my-realstate')
 }
 
 //Mostrar propiedad
-const showProperty = async(req,res)=>{
-    const {id} = req.params
+const showProperty = async (req, res) => {
+    const { id } = req.params
 
     //Comprobar que la propiedad existe
     const property = await Property.findByPk(id, {
         include: [
-            {model: Price, as: 'price'},
-            {model: Category, as: 'category'}
+            { model: Price, as: 'price' },
+            { model: Category, as: 'category' }
         ]
     })
 
-    if(!property){
+    if (!property) {
         return res.redirect('/404')
     }
 
 
-    res.render('properties/show',{
+    res.render('properties/show', {
         property,
         page: property.title
     })
