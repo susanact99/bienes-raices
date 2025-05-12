@@ -1,3 +1,4 @@
+import { Sequelize, Op } from "sequelize"
 import { Price, Category, Property } from "../models/index.js"
 
 
@@ -43,20 +44,70 @@ const landing = async(req,res) =>{
         categories,
         prices,
         apartments, 
-        houses
+        houses,
+        csrfToken: req.csrfToken()
     })
 }
 
-const category = (req,res) =>{
-    
+const category = async(req,res) =>{
+    const {id} = req.params
+
+    //Comprobar que la categoría exista
+    const category = await Category.findByPk(id)
+    if(!category){
+        return res.redirect('/404')
+    }
+
+    //Obtener las propiedades de la categoria
+
+    const properties = await Property.findAll({
+        where: {
+            categoryId: id
+        },
+        include: [
+            {model: Price, as: 'price'}
+        ]
+    })
+
+    res.render('category', {
+        page: 'Category',
+        properties,
+        csrfToken: req.csrfToken()
+    })
 }
 
 const notFound = (req,res) =>{
-    
+    res.render('404', {
+        page: 'No encontrada',
+        csrfToken: req.csrfToken() 
+    })
 }
 
-const search = (req,res) =>{
-    
+const search = async (req,res) =>{
+    const {search} = req.body
+ 
+    //Validar que no este vacio
+    if(!search.trim()){
+        return res.redirect('back')
+    }
+
+    //Consultar las propiedades
+    const properties = await Property.findAll({
+        where: {
+            title: {
+                [Op.like]: `%${search}%`
+            }
+        },
+        include: [
+            {model: Price, as: 'price'}
+        ]
+    })
+
+    res.render('search', {
+        page: 'Resultados de la búsqueda',
+        properties,
+        csrfToken: req.csrfToken()
+    })
 }
 
 export {
