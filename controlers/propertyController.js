@@ -1,6 +1,7 @@
 import { unlink } from 'node:fs/promises'
 import { validationResult } from "express-validator"
-import { Price, Category, Property } from '../models/index.js'
+import { Price, Category, Property, Message, User } from '../models/index.js'
+import { isSeller, formatDate } from '../helpers/index.js'
 
 const admin = async (req, res) => {
 
@@ -21,7 +22,7 @@ const admin = async (req, res) => {
         const offset = ((currentPage * limit) - limit)
 
         const [properties, total] = await Promise.all([
-             Property.findAll({
+            Property.findAll({
                 limit,
                 offset,
                 where: {
@@ -30,8 +31,9 @@ const admin = async (req, res) => {
                 include: [
                     { model: Category, as: 'category' },
                     { model: Price, as: 'price' },
+                    {model: Message, as: 'messages'}
                 ]
-            }), 
+            }),
             Property.count({
                 where: {
                     userId: id
@@ -326,8 +328,92 @@ const showProperty = async (req, res) => {
     res.render('properties/show', {
         property,
         page: property.title,
-        csrfToken: req.csrfToken()
+        csrfToken: req.csrfToken(),
+        user: req.user,
+        isSeller: isSeller(req.user?.id, property.userId)
     })
+}
+
+const sendMessage = async (req, res) => {
+    const { id } = req.params
+
+    //Comprobar que la propiedad existe
+    const property = await Property.findByPk(id, {
+        include: [
+            { model: Price, as: 'price' },
+            { model: Category, as: 'category' }
+        ]
+    })
+
+    if (!property) {
+        return res.redirect('/404')
+    }
+
+    //Validacion
+    let result = validationResult(req)
+    if (!result.isEmpty()) {
+        return res.render('properties/show', {
+            property,
+            page: property.title,
+            csrfToken: req.csrfToken(),
+            user: req.user,
+            isSeller: isSeller(req.user?.id, property.userId),
+            errors: result.array()
+        })
+    }
+
+    //Almacenar mensaje
+    const {message} = req.body
+    const {id:propertyId} = req.params
+    const {id: userId} = req.user
+
+    await Message.create({
+        message,
+        propertyId,
+        userId
+    })
+
+
+    res.render('properties/show', {
+        property,
+        page: property.title,
+        csrfToken: req.csrfToken(),
+        user: req.user,
+        isSeller: isSeller(req.user?.id, property.userId),
+        sended: true
+    })
+}
+
+const seeMessages = async(req, res) => {
+    const { id } = req.params
+
+    //Validar que la propiedad exista
+
+    const property = await Property.findByPk(id, {
+        include: [
+            {model: Message, as: 'messages', 
+                include: [
+                    {model: User.scope('removePassword'), as: 'user'}
+                ]
+            }
+        ]
+    })
+
+    if (!property) {
+        return res.redirect('/my-realstate')
+    }
+
+    //Revisar que quien visita la URL es quien creó la propiedad
+    if (property.userId.toString() !== req.user.id.toString()) {
+        return res.redirect('/my-realstate')
+    }
+
+    res.render('properties/messages', {
+        page: 'Messages',
+        messages: property.messages,
+        formatDate
+    }
+    )
 }
 
 export {
@@ -339,5 +425,7 @@ export {
     edit,
     saveChanges,
     deleteProperty,
-    showProperty
+    showProperty,
+    sendMessage,
+    seeMessages
 }
