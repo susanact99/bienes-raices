@@ -31,7 +31,7 @@ const admin = async (req, res) => {
                 include: [
                     { model: Category, as: 'category' },
                     { model: Price, as: 'price' },
-                    {model: Message, as: 'messages'}
+                    { model: Message, as: 'messages' }
                 ]
             }),
             Property.count({
@@ -64,7 +64,7 @@ const create = async (req, res) => {
     ])
 
     res.render('properties/create', {
-        page: 'Create property',
+        page: 'Crear propiedad',
         csrfToken: req.csrfToken(),
         categories,
         prices,
@@ -83,7 +83,7 @@ const save = async (req, res) => {
         ])
 
         return res.render('properties/create', {
-            page: 'Create property',
+            page: 'Crear propiedad',
             categories,
             csrfToken: req.csrfToken(),
             prices,
@@ -148,7 +148,7 @@ const addImage = async (req, res) => {
 
 
     res.render('properties/add-image', {
-        page: `Add image: ${property.title}`,
+        page: `Añade imagen: ${property.title}`,
         csrfToken: req.csrfToken(),
         property
     })
@@ -208,7 +208,7 @@ const edit = async (req, res) => {
     ])
 
     res.render('properties/edit', {
-        page: 'Edit property',
+        page: 'Editar propiedad',
         csrfToken: req.csrfToken(),
         categories,
         prices,
@@ -228,7 +228,7 @@ const saveChanges = async (req, res) => {
         ])
 
         return res.render('properties/edit', {
-            page: `Edit property: ${property.title}`,
+            page: `Editar propiedad: ${property.title}`,
             categories,
             csrfToken: req.csrfToken(),
             prices,
@@ -308,6 +308,33 @@ const deleteProperty = async (req, res) => {
     res.redirect('/my-realstate')
 }
 
+//Modificar el estado de la propiedad
+const changeState = async (req, res) => {
+    const { id } = req.params
+
+    //Validar que la propiedad exista
+
+    const property = await Property.findByPk(id)
+
+    if (!property) {
+        return res.redirect('/my-realstate')
+    }
+
+    //Revisar que quien visita la URL es quien creó la propiedad
+    if (property.userId.toString() !== req.user.id.toString()) {
+        return res.redirect('/my-realstate')
+    }
+    
+    //Actualizar
+    property.posted = !property.posted
+    await property.save()
+
+    res.json({
+        result :  true
+    })
+
+}
+
 //Mostrar propiedad
 const showProperty = async (req, res) => {
     const { id } = req.params
@@ -320,7 +347,7 @@ const showProperty = async (req, res) => {
         ]
     })
 
-    if (!property) {
+    if (!property || !property.posted) {
         return res.redirect('/404')
     }
 
@@ -363,9 +390,9 @@ const sendMessage = async (req, res) => {
     }
 
     //Almacenar mensaje
-    const {message} = req.body
-    const {id:propertyId} = req.params
-    const {id: userId} = req.user
+    const { message } = req.body
+    const { id: propertyId } = req.params
+    const { id: userId } = req.user
 
     await Message.create({
         message,
@@ -384,16 +411,17 @@ const sendMessage = async (req, res) => {
     })
 }
 
-const seeMessages = async(req, res) => {
+const seeMessages = async (req, res) => {
     const { id } = req.params
 
     //Validar que la propiedad exista
 
     const property = await Property.findByPk(id, {
         include: [
-            {model: Message, as: 'messages', 
+            {
+                model: Message, as: 'messages',
                 include: [
-                    {model: User.scope('removePassword'), as: 'user'}
+                    { model: User.scope('removePassword'), as: 'user' }
                 ]
             }
         ]
@@ -409,7 +437,7 @@ const seeMessages = async(req, res) => {
     }
 
     res.render('properties/messages', {
-        page: 'Messages',
+        page: 'Mensajes',
         messages: property.messages,
         formatDate
     }
@@ -425,6 +453,7 @@ export {
     edit,
     saveChanges,
     deleteProperty,
+    changeState,
     showProperty,
     sendMessage,
     seeMessages

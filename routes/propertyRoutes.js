@@ -1,6 +1,6 @@
 import express from 'express'
 import{body} from 'express-validator'
-import {admin, create, save, addImage, saveImage, edit, saveChanges, deleteProperty, showProperty, sendMessage, seeMessages} from '../controlers/propertyController.js'
+import {admin, create, save, addImage, saveImage, edit, saveChanges, deleteProperty, changeState, showProperty, sendMessage, seeMessages} from '../controlers/propertyController.js'
 import protectRoute from '../middleware/protectRoutes.js'
 import upload from '../middleware/uploadImage.js'
 import identifyUser from "../middleware/identifyUser.js"
@@ -54,6 +54,11 @@ router.post('/properties/edit/:id',protectRoute,
 router.post('/properties/delete/:id',
     protectRoute,
     deleteProperty
+)
+
+router.put('/properties/:id',
+    protectRoute,
+    changeState
 )
 
 //Area publica

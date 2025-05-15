@@ -4,6 +4,9 @@ header.bg-indigo-600.p-4
             h1.text-2xl.text-white.font-extrabold.text-center Real  
                 span.font-normal State
         nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white hidden")
-            a(href="/my-realstate") My properties 
-            a(href="") My profile
-            a(class="bg-indigo-800 py-2 px-10 rounded-lg" href="") Close sesion
+            a(href="/my-realstate") Mis propiedades 
+            a(href="") Mi perfil
+
+            form(action="/close-sesion" method="POST")
+                input(type="hidden" name="_csrf" value=csrfToken)
+                input(type="submit" class="bg-indigo-800 py-2 px-10 rounded-lg" value="Cerrar sesion") 

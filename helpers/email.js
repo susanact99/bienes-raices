@@ -13,10 +13,10 @@ const emailRegister = async(data)=>{
       const {email,name, token}= data
 
       await transport.sendMail({
-        from: 'BienesRices.com',
+        from: 'RealState.com',
         to: email,
-        subject: 'Confirma tu cuenta en BienesRices.com',
-        text: 'Confirma tu cuenta en BienesRices.com',
+        subject: 'Confirma tu cuenta en RealState.com',
+        text: 'Confirma tu cuenta en RealState.com',
         html: `
             <p>Hola ${name}, comprueba tu cuenta de bienesraices.com</p>
 
@@ -43,15 +43,15 @@ const emailForgotPassword = async(data)=>{
     const {email,name, token}= data
 
     await transport.sendMail({
-      from: 'BienesRices.com',
+      from: 'RealState.com',
       to: email,
-      subject: 'Restablece tu password en BienesRices.com',
-      text: 'Restablece tu password en BienesRices.com',
+      subject: 'Restablece tu password en RealState.com',
+      text: 'Restablece tu password en RealState.com',
       html: `
-          <p>Hola ${name}, has solicitado restablecer tu password de bienesraices.com</p>
+          <p>Hola ${name}, has solicitado restablecer tu contraseña de bienesraices.com</p>
 
-          <p>Sigue el siguiente enlace para generar un password nuevo:
-          <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/forgot-password/${token}">Restablecer password</a>
+          <p>Sigue el siguiente enlace para generar una contraseña nueva:
+          <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/forgot-password/${token}">Restablecer contraseña</a>
       
           <p>Si no solicitaste el cambio de password puedes ignorar el mensaje</p>
       `

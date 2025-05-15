@@ -7,14 +7,14 @@ import { emailRegister, emailForgotPassword } from '../helpers/email.js'
 
 const formLogin = (req, res) => {
     res.render('auth/login', {
-        page: "Login",
+        page: "Iniciar sesión",
         csrfToken: req.csrfToken()
     })
 }
 
 const formRegister = (req, res) => {
     res.render('auth/register', {
-        page: "Create account",
+        page: "Crear cuenta",
         csrfToken: req.csrfToken()
     })
 }
@@ -52,7 +52,7 @@ const authenticate = async (req, res) => {
     //Comprobar si el usuario est aconfirmado
     if (!user.confirm) {
         return res.render('auth/login', {
-            page: 'Login',
+            page: 'Iniciar sesión',
             csrfToken: req.csrfToken(),
             errors: [{ msg: 'The user is not confirmed' }]
         })
@@ -61,7 +61,7 @@ const authenticate = async (req, res) => {
     //Revisar el password
     if (!(await user.checkPassword(password))) {
         return res.render('auth/login', {
-            page: 'Login',
+            page: 'Iniciar sesión',
             csrfToken: req.csrfToken(),
             errors: [{ msg: 'The password is incorrect' }]
         })
@@ -94,7 +94,7 @@ const userRegister = async (req, res) => {
     if (!result.isEmpty()) {
         //Errores
         return res.render('auth/register', {
-            page: "Create acount",
+            page: "Crear cuenta",
             csrfToken: req.csrfToken(),
             errors: result.array(),
             user: {
@@ -110,7 +110,7 @@ const userRegister = async (req, res) => {
 
     if (duplicateUser) {
         return res.render('auth/register', {
-            page: "Create acount",
+            page: "Crear cuenta",
             csrfToken: req.csrfToken(),
             errors: [{
                 msg: 'This email is being used'
@@ -138,8 +138,8 @@ const userRegister = async (req, res) => {
 
     //Mostrar mensaje de confirmacion
     res.render('templates/message', {
-        page: 'The account has been created successfully.',
-        message: 'We have sent a confirmation email, click on the link'
+        page: 'La cuenta ha sido creada exitosamente.',
+        message: 'Te hemos enviado un email de confirmación, haz click en el link'
     })
 }
 
@@ -151,8 +151,8 @@ const confirmAccount = async (req, res) => {
 
     if (!user) {
         return res.render('auth/confirm-account', {
-            page: 'Error confirming the account',
-            message: 'An error occurred while confirming the account, try again',
+            page: 'Ha ourrido un error confirmando la cuenta',
+            message: 'Ha ocurrido un error, intentalo otra vez',
             error: true
         })
     }
@@ -163,21 +163,21 @@ const confirmAccount = async (req, res) => {
     await user.save();
 
     res.render('auth/confirm-account', {
-        page: 'Account confirmed',
-        message: 'Your account has been successfully confirmed!',
+        page: 'Cuenta confirmada',
+        message: 'Tu cuenta ha sido confirmada exitosamente!',
         error: false
     })
 }
 
 const formForgotPassword = (req, res) => {
     res.render('auth/forgot-password', {
-        page: "Recover you access to Real State",
+        page: "Recupera tu acceso a Real State",
         csrfToken: req.csrfToken()
     })
 }
 
 const resetPassword = async (req, res) => {
-    await check('email').isEmail().withMessage('The email must include an @').run(req)
+    await check('email').isEmail().withMessage('El email debe incluir un @').run(req)
 
     let result = validationResult(req)
 
@@ -186,7 +186,7 @@ const resetPassword = async (req, res) => {
     if (!result.isEmpty()) {
         //Errores
         return res.render('auth/forgot-password', {
-            page: "Recover you access to Real State",
+            page: "Recupera tu acceso a Real State",
             csrfToken: req.csrfToken(),
             errors: result.array(),
         })
@@ -199,9 +199,9 @@ const resetPassword = async (req, res) => {
 
     if (!user) {
         return res.render('auth/forgot-password', {
-            page: "Recover your access to Real State",
+            page: "Recupera tu acceso a Real State",
             csrfToken: req.csrfToken(),
-            errors: [{ msg: "The email does not belong to any user" }]
+            errors: [{ msg: "El email no pertenece a ningun usuario" }]
         })
     }
 
@@ -218,8 +218,8 @@ const resetPassword = async (req, res) => {
 
     //Renderizar mensaje
     res.render('templates/message', {
-        page: 'Reset your password',
-        message: 'We sent an email with the instructions',
+        page: 'Restablece tu contraseña',
+        message: 'Hemos enviado un email con las instrucciones',
         error: false
     })
 }
@@ -230,8 +230,8 @@ const verifyToken = async (req, res) => {
 
     if (!user) {
         return res.render('auth/confirm-account', {
-            page: 'Reset your password',
-            message: 'There was an error validating the information, please try again',
+            page: 'Cambia la contraseña',
+            message: 'Ha ocurrido un error validando la información, intentalo otra vez',
             error: true
         })
     }
@@ -239,7 +239,7 @@ const verifyToken = async (req, res) => {
     //Mostrar formulario para validar el password
 
     res.render('auth/reset-password', {
-        page: 'Restablece tu password',
+        page: 'Restablece tu contraseña',
         csrfToken: req.csrfToken()
     })
 }
@@ -255,7 +255,7 @@ const newPassword = async (req, res) => {
     if (!result.isEmpty()) {
         //Errores
         return res.render('auth/reset-password', {
-            page: "Reset your password",
+            page: "Restablece tu contraseña",
             csrfToken: req.csrfToken(),
             errors: result.array(),
 
@@ -277,9 +277,13 @@ const newPassword = async (req, res) => {
     await user.save()
 
     res.render('auth/confirm-account', {
-        page: 'New password saved',
-        message: 'The password was saved succesfully'
+        page: 'Nueva contraseña guardada',
+        message: 'La contraseña ha sido guardada exitosamente'
     })
+}
+
+const closeSesion = async(req, res) => {
+    return res.clearCookie('_token').status(200).redirect('/auth/login')
 }
 
 export {
@@ -291,5 +295,6 @@ export {
     confirmAccount,
     resetPassword,
     verifyToken,
-    newPassword
+    newPassword,
+    closeSesion
 }

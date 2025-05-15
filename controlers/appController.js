@@ -70,7 +70,7 @@ const category = async(req,res) =>{
     })
 
     res.render('category', {
-        page: 'Category',
+        page: 'Categoría',
         properties,
         csrfToken: req.csrfToken()
     })

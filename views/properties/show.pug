@@ -9,7 +9,7 @@ block content
         h1(id="title" class="text-4xl my-10 font-extrabold text-center")= property.title 
 
         div 
-            a(href="#" class="font-bold text-gray-600 text-sm") Category: 
+            a(href="#" class="font-bold text-gray-600 text-sm") Categoría: 
                 span(class="font-normal")= property.category.name
 
             div(class="mt-5 md:flex md:gap-4 md:items-start")
@@ -19,28 +19,28 @@ block content
                     div(class="px-5 py-10 space-y-5")
                         p= property.description
 
-                        h2(class="text-2xl leading-6 font-bold text-gray-900") Property details 
+                        h2(class="text-2xl leading-6 font-bold text-gray-900") Detalles de la propiedad
 
                         div(class="grid grid-cols-1 md:grid-cols-2")
-                            p(class="text-gray-600 font-bold text-lg") Bathrooms    
+                            p(class="text-gray-600 font-bold text-lg") Baños    
                                 span(class="text-gray-800 block text-lg ")= property.bathrooms
-                            p(class="text-gray-600 font-bold text-lg") Rooms    
+                            p(class="text-gray-600 font-bold text-lg") Habitaciones    
                                 span(class="text-gray-800 block text-lg")= property.rooms
-                            p(class="text-gray-600 font-bold text-lg") Parking    
+                            p(class="text-gray-600 font-bold text-lg") Aparcamiento    
                                 span(class="text-gray-800 block text-lg")= property.parking
-                            p(class="text-gray-600 font-bold text-lg") Price    
+                            p(class="text-gray-600 font-bold text-lg") Precio    
                                 span(class="text-gray-800 block text-lg")= property.price.name
 
                 div(class="md:w-1/3 bg-white shadow rounded-lg") 
 
-                    h3(class="text-center py-10 leading-6 text-2xl font-bold text-gray-900") Location 
+                    h3(class="text-center py-10 leading-6 text-2xl font-bold text-gray-900") Ubicación 
 
                     div(class="h-96" id="map")
                         p(id="lat" class="hidden")= property.lat 
                         p(id="lng" class="hidden")= property.lng 
 
                     div(class="p-5")
-                        p(class="text-gray-600 font-bold text-lg") Direction 
+                        p(class="text-gray-600 font-bold text-lg") Dirección 
                             span( class="text-gray-800 block text-lg")= property.street
 
                         if !isSeller
