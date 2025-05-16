@@ -4,12 +4,20 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="/css/output.css")
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap")
+    style.
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
     title Real State | #{page}
     block styles
 
-  body.min-h-screen.bg-gray-50
-    main(class="mx-auto container mt-10 px-2")
-      
+  body(class="min-h-screen bg-gray-50 flex flex-col")
+    main(class="mx-auto container mt-10 px-4 sm:px-6 lg:px-8 flex-grow")
       block content
+
+    footer(class="bg-black text-white py-6 mt-auto")
+      div(class="container mx-auto px-4 sm:px-6 lg:px-8 text-center")
+        p(class="text-sm") &copy; #{new Date().getFullYear()} Real State. Todos los derechos reservados.
 
     block scripts

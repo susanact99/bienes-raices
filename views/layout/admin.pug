@@ -5,13 +5,18 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         block styles
         link(rel="stylesheet", href="/css/output.css")
+        link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap")
+        style.
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
         title Real State | #{page}
         
     body.min-h-screen.bg-gray-50
         include includes/header-admin
         
-        main(class="mx-auto container mt-10 px-2")
-            
+        main(class="mx-auto container mt-10 px-4 sm:px-6 lg:px-8 pb-12")
             block content
 
+        
         block scripts

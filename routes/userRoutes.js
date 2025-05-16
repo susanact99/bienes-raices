@@ -7,9 +7,6 @@ const router = express.Router();
 router.get('/login', formLogin)
 router.post('/login', authenticate)
 
-router.post('/auth/close-sesion', closeSesion)
-
-
 router.get('/register', formRegister)
 router.post('/register', userRegister)
 
@@ -21,7 +18,7 @@ router.post('/forgot-password', resetPassword)
 router.get('/forgot-password/:token', verifyToken)
 router.post('/forgot-password/:token', newPassword)
 
-
+router.post('/close-sesion', closeSesion)
 
 
 

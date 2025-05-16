@@ -3,22 +3,21 @@ extends ../layout/admin
 block styles
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.css")
     meta(name="csrf-token" content=csrfToken)
+    
 block content
+  div(class="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8")
+    h1(class="text-4xl my-10 font-extrabold text-center")
+      span(class="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent") Real
+      span(class="font-normal text-black") state 
+    h2(class="text-center text-2xl md:text-3xl font-bold text-gray-800 mb-8")= page
 
-  div.py-10
-    h1.text-4xl.my-10.font-extrabold.text-center Real
-      span.font-normal state 
-    h2.text-center.text-2xl.font-extrabold= page
-
-    div(class="bg-white shadow py-8 px-4 rounded mx-auto max-w-4xl my-10 md:px-10")
-        form(id='image' class="dropzone border-2 border-dashed w-full min-h-96 h-auto rounded flex flex-col justify-center items-center" method="POST" action=`/properties/add-image/${property.id}`)
-
+    div(class="bg-white shadow-lg py-8 px-6 rounded-2xl mx-auto max-w-4xl my-10")
+        p(class="text-gray-600 mb-6 text-center") Arrastra tu imagen o haz click para seleccionar
+        
+        form(id='image' class="dropzone border-2 border-dashed border-gray-300 w-full min-h-96 h-auto rounded-xl flex flex-col justify-center items-center hover:border-black transition-colors" method="POST" action=`/properties/add-image/${property.id}`)
             input(type="hidden" name="_csrf" value=csrfToken)             
                 
-                
-        button( id="post" class="mt-5 w-full py-3 bg-indigo-600 hover:bg-indigo-700 rounded text-white font-bold uppercase cursor-pointer" type="button" ) Publicar propiedad
-                    
+        button(id="post" class="mt-8 w-full py-3 bg-black hover:bg-gray-800 rounded-lg text-white font-bold uppercase cursor-pointer transition-colors" type="button") Publicar propiedad
 
 block scripts
     script(src="/js/addImage.js")
-    

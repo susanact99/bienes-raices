@@ -4,64 +4,76 @@ block styles
   meta(name="csrf-token" content= csrfToken)
 
 block content
+  div(class="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8")
+    h1(class="text-4xl my-10 font-extrabold text-center")
+      span(class="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent") Real
+      span(class="font-normal text-black") state 
+    h2(class="text-center text-2xl md:text-3xl font-bold text-gray-800 mb-8")= page
 
-  div.py-10
-    h1.text-4xl.my-10.font-extrabold.text-center Real
-      span.font-normal state 
-    h2.text-center.text-2xl.font-extrabold= page
-
-    a(href="/properties/create" class="rounded py-2 px-10 bg-indigo-600 hove:bg-indigo-700 text-sm font-bold text-center text-white uppercase my-5 inline-block w-full sm:w-auto")  Publicar propiedad
-
-    //-pre= JSON.stringify(properties, undefined, 2)
+    a(href="/properties/create" class="rounded-lg py-3 px-6 bg-black hover:bg-gray-800 text-sm font-bold text-center text-white uppercase my-5 inline-block w-full sm:w-auto transition-colors") Publicar propiedad
 
     if properties.length 
-      div(class="bg-white shadow rounded-lg")
+      div(class="bg-white shadow-lg rounded-2xl overflow-hidden")
         ul(class="divide-y divide-gray-200")
           each property in properties   
             li 
               div(class="p-6 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-8 md:space-y-0 gap-4")
                 div(class="sm:w-1/4 md:w-1/6")
-                  img(src=`uploads/${property.image}`, alt=`${property.title}` , class="w-full block")
+                  img(src=`uploads/${property.image}`, alt=`${property.title}` , class="w-full block rounded-lg shadow-sm")
+                
                 div(class="sm:w-2/4 md:w-3/6 lg:w-4/6 space-y-3")
-                  a(class="block text-2xl font-extrabold text-indigo-600 truncate" href=`/property/${property.id}`)= property.title
+                  a(class="block text-xl font-bold text-black hover:text-gray-700 transition-colors truncate" href=`/property/${property.id}`)= property.title
 
-                  p(class="text-sm text-black font-bold")= property.category.name
+                  p(class="text-sm text-gray-700 font-medium")= property.category.name
 
-                  p(class="text-sm text-gray-500 font-bold flex items-center") 
-                    svg(xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6")
+                  p(class="text-sm text-gray-600 font-medium flex items-center") 
+                    svg(xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1 text-gray-700")
                       path(stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z")
                     = property.price.name
 
-                  a(href=`/messages/${property.id}` class="text-s text-gray-600")= `${property.messages.length} Mensajes`
+                  a(href=`/messages/${property.id}` class="text-sm text-gray-600 hover:text-black transition-colors flex items-center")
+                    svg(xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1")
+                      path(stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75")
+                    = `${property.messages.length} Mensajes`
 
                 div(class="sm:w-1/4 md:w-2/6 lg:w-1/6 flex flex-col gap-2 2xl:flex-row")
+                  button(type="button" data-property-id=`${property.id}` class=`change-state w-full px-2 py-2 md:py-1 text-xs leading-5 font-semibold rounded-lg cursor-pointer transition-colors ${property.posted ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-yellow-100 text-red-800 hover:bg-yellow-200'}`)=`${property.posted ? 'Publicada' : 'No publicada'}`
 
-                  button(type="button" data-property-id=`${property.id}` class=`change-state w-full px-2 py-2 md:py-1 text-xs leading-5 font-semibold rounded cursor-pointer ${property.posted ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-red-800'}`)=`${property.posted ? 'Posted' : 'Not posted'}`
-
-                  a(href=`/properties/edit/${property.id}` class="text-center px-2 py-2 md:py-1 text-xs leading-5 font-semibold rounded cursor-pointer bg-indigo-100 text-indigo-800") Edit
+                  a(href=`/properties/edit/${property.id}` class="text-center px-2 py-2 md:py-1 text-xs leading-5 font-semibold rounded-lg cursor-pointer bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors") Editar
 
                   form(method="POST" action=`properties/delete/${property.id}`)
                     input(type="hidden" name="_csrf" value= csrfToken)
-                    input(type="submit" class="w-full px-2 py-2 md:py-1 text-xs leading-5 font-semibold rounded cursor-pointer bg-red-100 text-red-800" value="Eliminar")
-        div(class="bg-white px-4 py-3 flex items-center justyfy-between border-t border-gray-200 sm:px-6")
+                    input(type="submit" class="w-full px-2 py-2 md:py-1 text-xs leading-5 font-semibold rounded-lg cursor-pointer bg-red-100 text-red-800 hover:bg-red-200 transition-colors" value="Eliminar")
+        
+        div(class="bg-white px-4 py-5 flex items-center justify-between border-t border-gray-200 sm:px-6")
           div(class="flex-1 flex justify-between sm:hidden")
-            a(href=`/my-realstate?page=${currentPage - 1}` class=`${currentPage == "1" ? 'pointer-events-none' : ''} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`) Anterior
+            a(href=`/my-realstate?page=${currentPage - 1}` class=`${currentPage == "1" ? 'pointer-events-none opacity-50' : ''} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors`) Anterior
 
-            a(href=`/my-realstate?page=${currentPage + 1}` class=`${currentPage === pages ? 'pointer-events-none' : ''} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`) Siguiente
+            a(href=`/my-realstate?page=${currentPage + 1}` class=`${currentPage === pages ? 'pointer-events-none opacity-50' : ''} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors`) Siguiente
 
           div(class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between")
             p(class="text-sm text-gray-700 gap-2") Mostrando 
               span(class="font-medium") #{offset + 1} a 
               span(class="font-medium") #{total < limit + offset? total : limit + offset} de 
               span(class="font-medium") #{total} resultados
+          
           div(class="hidden sm:block") 
             nav(class="relative z-0 inline-flex rounded-md shadow-md")
               - var n = 1;
                   while n <= pages 
-                    a(href=`/my-realstate?page=${n}` class=`${currentPage == n ? 'bg-indigo-50 border-indigo-500 text-ingigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bbg-gray-50'} relative inline-flex items-center px-4 py-2 border text-sm font-medium`) #{n++}           
+                    a(href=`/my-realstate?page=${n}` class=`${currentPage == n ? 'bg-black text-white' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors`) #{n++}           
     else 
-      p.text-center No hay propiedades
+      div(class="bg-white rounded-2xl shadow-md p-10 text-center my-10")
+        svg(class="w-16 h-16 mx-auto text-gray-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor")
+          path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6")
+        
+        h3(class="text-xl font-bold text-gray-800 mb-2") No hay propiedades
+        p(class="text-gray-600") Aún no has publicado ninguna propiedad.
+        
+        a(href="/properties/create" class="inline-flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-5 py-3 rounded-lg transition-colors font-medium mt-6")
+          svg(class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor")
+            path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4")
+          | Publicar propiedad
 
 block scripts 
   script(src="/js/changeState.js")
-
